@@ -1,0 +1,123 @@
+pragma solidity ^0.8.7;
+
+contract Owned
+{
+    address owner;
+    
+    constructor() public
+    {
+        owner=msg.sender;
+    }
+    
+    modifier OnlyOwner
+    {
+        require
+        (
+            msg.sender==owner,
+            "Only owner can run this function!"
+        );
+        _;
+    }
+    
+    function changeOwner(address newOwner) OnlyOwner public{
+        owner=newOwner;
+    }
+    
+    function getBalance() OnlyOwner public returns(uint){
+        return address(this).balance;
+    }
+}
+
+
+
+contract Diploma is Owned
+{
+    modifier OnlyEmployee
+    {
+        require
+        (
+            employees_ind[msg.sender]>0,
+            "Only employee can run this function!"
+        );
+        _;
+    }
+    
+    modifier Costs(uint n)
+    {
+        require
+        (
+            msg.value>=n,
+            "Not enough money!"
+        );
+        _;
+    }
+    
+    struct Diploma{
+        string fio;
+        string number;
+        string date;
+    }
+    
+    Diploma[] diplomas;
+    address[] employees;
+    mapping(string=>uint[]) private byfio;
+    mapping(string=>uint) private bynumber;
+    mapping(address=>uint) private employees_ind;
+   
+    function diplomAdd(string memory fio, string memory number, string memory date) OnlyEmployee public returns(bool){
+        if(bynumber[number]==0)
+        {
+            Diploma memory d;
+            d.fio=fio;
+            d.number=number;
+            d.date=date;
+            diplomas.push(d);
+            uint size=diplomas.length;
+            byfio[fio].push(size);
+            bynumber[number]=size;
+            
+            return true;
+        
+        }
+    else return false;
+    }
+    
+    function employeeAdd(address empl) OnlyOwner public{
+        employees.push(empl);
+        employees_ind[empl]=employees.length;
+    }
+    
+    function employeesGet() OnlyOwner public returns(address[] memory empls){
+        return employees;
+    }
+    
+    function employeeDelete(address empl) OnlyOwner public returns(bool){
+        uint index=employees_ind[empl];
+        if(index>0)
+        {
+            delete employees[index-1];
+            delete employees_ind[empl];
+            return true;
+        }
+        return false;
+    }
+    
+    function diplomGetByFIO(string memory fio) Costs(2e15) payable public returns (Diploma[] memory){
+        uint[] memory temp=byfio[fio];
+        Diploma[] memory result = new Diploma[](temp.length );
+        for(uint i=0;i<temp.length;i++)
+        {
+            result[i]=diplomas[temp[i]-1];
+        }
+        return result;
+    }
+    
+    function diplomGetByNumber(string memory number) Costs(1e15) payable public returns (Diploma memory){
+        if (bynumber[number]>0 && bynumber[number]<=diplomas.length)
+        {
+        return diplomas[bynumber[number]-1];
+        }
+        Diploma memory nullObj;
+        return nullObj;
+    }
+}
