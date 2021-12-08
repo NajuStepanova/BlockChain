@@ -2,26 +2,13 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "changeOwner",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "string",
 				"name": "fio",
 				"type": "string"
 			},
 			{
 				"internalType": "string",
-				"name": "number",
+				"name": "serialNumber",
 				"type": "string"
 			},
 			{
@@ -30,7 +17,7 @@
 				"type": "string"
 			}
 		],
-		"name": "diplomAdd",
+		"name": "AddDiploma",
 		"outputs": [
 			{
 				"internalType": "bool",
@@ -44,12 +31,77 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "fio",
-				"type": "string"
+				"internalType": "address",
+				"name": "empl",
+				"type": "address"
 			}
 		],
-		"name": "diplomGetByFIO",
+		"name": "AddEmployee",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "ChangeOwner",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "empl",
+				"type": "address"
+			}
+		],
+		"name": "DeleteEmployee",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "GetBalance",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "GetEmployees",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "empls",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "GetResult",
 		"outputs": [
 			{
 				"components": [
@@ -60,7 +112,7 @@
 					},
 					{
 						"internalType": "string",
-						"name": "number",
+						"name": "serialNumber",
 						"type": "string"
 					},
 					{
@@ -74,6 +126,19 @@
 				"type": "tuple[]"
 			}
 		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "fio",
+				"type": "string"
+			}
+		],
+		"name": "InquireDiplomaByFIO",
+		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"
 	},
@@ -81,94 +146,13 @@
 		"inputs": [
 			{
 				"internalType": "string",
-				"name": "number",
+				"name": "serialNumber",
 				"type": "string"
 			}
 		],
-		"name": "diplomGetByNumber",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "string",
-						"name": "fio",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "number",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "date",
-						"type": "string"
-					}
-				],
-				"internalType": "struct Diploma.Diploma",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "empl",
-				"type": "address"
-			}
-		],
-		"name": "employeeAdd",
+		"name": "InquireDiplomaByNumber",
 		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "empl",
-				"type": "address"
-			}
-		],
-		"name": "employeeDelete",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "employeesGet",
-		"outputs": [
-			{
-				"internalType": "address[]",
-				"name": "empls",
-				"type": "address[]"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "getBalance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	}
 ]

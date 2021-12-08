@@ -6,94 +6,102 @@ contract Owned
     
     constructor() public
     {
-        owner=msg.sender;
+        owner = msg.sender;
     }
     
     modifier OnlyOwner
     {
         require
         (
-            msg.sender==owner,
+            msg.sender == owner,
             "Only owner can run this function!"
         );
         _;
     }
     
-    function changeOwner(address newOwner) OnlyOwner public{
-        owner=newOwner;
+    function ChangeOwner(address newOwner) OnlyOwner public 
+    {
+        owner = newOwner;
     }
     
-    function getBalance() OnlyOwner public returns(uint){
+    function GetBalance() OnlyOwner public returns(uint)
+    {
         return address(this).balance;
     }
 }
-
-
 
 contract Diploma is Owned
 {
     modifier OnlyEmployee
     {
-        require
-        (
+        require(
             employees_ind[msg.sender]>0,
             "Only employee can run this function!"
-        );
+            );
         _;
     }
     
     modifier Costs(uint n)
     {
-        require
-        (
+        require(
             msg.value>=n,
-            "Not enough money!"
-        );
+            'Not enough money!!!'
+            );
         _;
     }
     
-    struct Diploma{
+    struct Diploma
+    {
         string fio;
-        string number;
+        string serialNumber;
         string date;
+    }
+
+    struct Inquire
+    {
+        string arg;
+        uint type_inq;
     }
     
     Diploma[] diplomas;
     address[] employees;
-    mapping(string=>uint[]) private byfio;
-    mapping(string=>uint) private bynumber;
-    mapping(address=>uint) private employees_ind;
-   
-    function diplomAdd(string memory fio, string memory number, string memory date) OnlyEmployee public returns(bool){
-        if(bynumber[number]==0)
+    mapping(string => uint[]) private byfio;
+    mapping(string => uint) private bynumber;
+    mapping(address => uint) private employees_ind;
+    mapping(address => Inquire[]) private inquires;
+
+    function AddDiploma(string memory fio, string memory  serialNumber, string memory date) OnlyEmployee public returns (bool)
+    {
+        if (bynumber[serialNumber] == 0)
         {
             Diploma memory d;
-            d.fio=fio;
-            d.number=number;
-            d.date=date;
+            d.fio = fio;
+            d.serialNumber = serialNumber;
+            d.date = date;
             diplomas.push(d);
-            uint size=diplomas.length;
+            uint size = diplomas.length;
             byfio[fio].push(size);
-            bynumber[number]=size;
-            
+            bynumber[serialNumber] = size;
             return true;
-        
         }
-    else return false;
+        else return false;
     }
     
-    function employeeAdd(address empl) OnlyOwner public{
+    function AddEmployee(address empl) OnlyOwner public
+    {
         employees.push(empl);
-        employees_ind[empl]=employees.length;
+        employees_ind[empl] = employees.length;
     }
     
-    function employeesGet() OnlyOwner public returns(address[] memory empls){
+    function GetEmployees() OnlyOwner public returns(address[] memory empls)
+    {
         return employees;
     }
     
-    function employeeDelete(address empl) OnlyOwner public returns(bool){
-        uint index=employees_ind[empl];
-        if(index>0)
+    function DeleteEmployee(address empl) OnlyOwner public returns(bool)
+    {
+        uint index = employees_ind[empl];
+        if(index > 0)
         {
             delete employees[index-1];
             delete employees_ind[empl];
@@ -102,22 +110,52 @@ contract Diploma is Owned
         return false;
     }
     
-    function diplomGetByFIO(string memory fio) Costs(2e15) payable public returns (Diploma[] memory){
-        uint[] memory temp=byfio[fio];
-        Diploma[] memory result = new Diploma[](temp.length );
-        for(uint i=0;i<temp.length;i++)
-        {
-            result[i]=diplomas[temp[i]-1];
-        }
-        return result;
+    function InquireDiplomaByFIO(string memory fio) Costs(2e15) payable public
+    {
+        Inquire memory inq;
+        inq.arg = fio;
+        inq.type_inq = 1;
+        inquires[msg.sender].push(inq);
     }
     
-    function diplomGetByNumber(string memory number) Costs(1e15) payable public returns (Diploma memory){
-        if (bynumber[number]>0 && bynumber[number]<=diplomas.length)
+    function InquireDiplomaByNumber(string memory serialNumber) Costs(1e15) payable public
+    {
+        Inquire memory inq;
+        inq.arg = serialNumber;
+        inq.type_inq = 2;
+        inquires[msg.sender].push(inq);
+    }
+
+    function GetResult() public returns(Diploma[] memory)
+    {
+        uint n = 0;
+        for(uint i=0;i<inquires[msg.sender].length;i++)
         {
-        return diplomas[bynumber[number]-1];
+            if(inquires[msg.sender][i].type_inq == 2) n++;
+            else n += byfio[inquires[msg.sender][i].arg].length;
         }
-        Diploma memory nullObj;
-        return nullObj;
+        Diploma[] memory result = new Diploma[](n);
+        uint k=0;
+        for(uint i=0;i<inquires[msg.sender].length;i++)
+        {
+            if(inquires[msg.sender][i].type_inq == 2)
+            {
+                if (bynumber[inquires[msg.sender][i].arg] > 0 && bynumber[inquires[msg.sender][i].arg] <= diplomas.length)
+                {
+                    result[k] = diplomas[bynumber[inquires[msg.sender][i].arg]-1];
+                    k++;
+                }
+            }else
+            {
+                uint[] memory temp = byfio[inquires[msg.sender][i].arg];
+                for(uint j=0;j<temp.length;j++)
+                {
+                    result[k] = diplomas[temp[j]-1];
+                    k++;
+                }
+            }
+        }
+        delete inquires[msg.sender];
+        return result;
     }
 }
